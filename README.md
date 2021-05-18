@@ -6,4 +6,4 @@
 - Tính năng:
     - Các tính năng của một trò chơi platformer bình thường như: Chạy, nhảy, lưu điểm, gameover, điểm cao...
 ___________________________________________________________________________________________________________
-  Thư mục trong Branch Master
+  Thư mục trong Branch Master ( CHƯA HOÀN THIỆN )
