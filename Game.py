@@ -1,5 +1,4 @@
 import pygame
-from pygame.key import set_repeat
 from pygame.locals import *
 from pygame import mixer
 
