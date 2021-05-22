@@ -262,22 +262,32 @@ class World():
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load('img/Goomba1.png')
-		self.image = pygame.transform.scale(self.image,  (45, 45))
+		self.images_enemy = []
+		self.index = 0
+		for step in range(1,3):
+			self.image = pygame.image.load(f'img/Goomba{step}.png')
+			self.image = pygame.transform.scale(self.image,  (45, 45))
+			self.images_enemy.append(self.image)
 		self.rect = self.image.get_rect()
+				
 		self.rect.x = x
 		self.rect.y = y
 		self.move_direction = 1
 		self.move_counter = 0
+		self.scounter = 0
 		
-		# self.images_enemy = []
-		# for step in range(1,3):
-		# 	img_enemy = pygame.image.load(f'img/Goomba{step}.png')
-		# 	img_enemy = pygame.transform.scale(img_enemy,  (40, 40))
-		# 	self.images_enemy.append(img_enemy)
-		# self.rect = self.images_enemy.get_rect()
+		
 
 	def update(self):
+		move_cooldown = 18
+		self.scounter += 1
+		if self.scounter > move_cooldown:
+			self.scounter = 0
+			self.index += 1
+		if self.index >= len(self.images_enemy):
+			self.index = 0 		
+		self.image = self.images_enemy[self.index]
+
 		self.rect.x += self.move_direction
 		self.move_counter += 1 
 		if abs(self.move_counter) > 50:
@@ -287,11 +297,27 @@ class Enemy(pygame.sprite.Sprite):
 class Lava(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('img/lava1.png')
-		self.image = pygame.transform.scale(img,  (tile_size , tile_size))
-		self.rect = self.image.get_rect()
+		self.images_lava = []
+		self.index = 0
+		for lava in range(1,3):
+			self.image = pygame.image.load(f'img/lava{lava}.png')
+			self.image = pygame.transform.scale(self.image,  (tile_size, tile_size))
+			self.images_lava.append(self.image)
+
+		self.rect = self.image.get_rect()				
 		self.rect.x = x
 		self.rect.y = y
+		self.lcounter = 0
+	
+	def update(self):
+		lava_cooldown = 18
+		self.lcounter += 1
+		if self.lcounter > lava_cooldown:
+			self.scounter = 0
+			self.index += 1
+		if self.index >= len(self.images_lava):
+			self.index = 0 		
+		self.image = self.images_lava[self.index]
 
 class Star(pygame.sprite.Sprite):
 	def __init__(self, x, y):
