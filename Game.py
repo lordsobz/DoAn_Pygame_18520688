@@ -169,7 +169,8 @@ class Player():
 			if self.floating == True:
 				if pygame.sprite.spritecollide(self, Goomba_group, True):
 					self.vel_y = -16
-					self.jumped = True						
+					self.jumped = True
+					jump_fx.play()
 			else:
 				if pygame.sprite.spritecollide(self, Goomba_group, False):
 					game_over = -1
