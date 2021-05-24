@@ -97,7 +97,11 @@ class Player():
 		if game_over == 0:
 
 			#Set key
-			key = pygame.key.get_pressed()			
+			key = pygame.key.get_pressed()	
+			if key[pygame.K_q]:
+				pygame.quit()
+			if key[pygame.K_r]:
+				reset()	
 			if key[pygame.K_UP] and self.jumped == False and self.floating == False:
 				jump_fx.play()
 				self.vel_y = -20
