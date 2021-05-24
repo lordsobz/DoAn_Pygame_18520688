@@ -26,7 +26,7 @@ game_menu = True
 score = 0
 
 white = (255,255,255)
-blue = (0,0,255)
+blue  = (0,0,255)
 
 #import hinh anh
 bg_img = pygame.image.load('img/background.jpg')
@@ -42,10 +42,15 @@ pygame.mixer.music.set_volume(0.2)
 coin_fx = pygame.mixer.Sound('img/coin_fx.mp3')
 coin_fx.set_volume(0.03)
 jump_fx = pygame.mixer.Sound('img/mario_jump.wav')
-jump_fx.set_volume(0.05)
+jump_fx.set_volume(0.04)
 die_fx = pygame.mixer.Sound('img/mario_dies.wav')
-die_fx.set_volume(0.2)
-
+die_fx.set_volume(0.4)
+stomp_fx = pygame.mixer.Sound('img/stomp.mp3')
+stomp_fx.set_volume(0.45)
+victory_fx = pygame.mixer.Sound("img/Victory_real.mp3")
+victory_fx.set_volume(0.45)
+mystery_fx = pygame.mixer.Sound("img/Mystery_fx.mp3")
+mystery_fx.set_volume(0.8)
 def draw_text(text, font, text_col, x, y):
 	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
@@ -170,9 +175,9 @@ class Player():
 				if pygame.sprite.spritecollide(self, Goomba_group, True):
 					self.vel_y = -16
 					self.jumped = True
-					jump_fx.play()
+					stomp_fx.play()						
 			else:
-				if pygame.sprite.spritecollide(self, Goomba_group, False):
+				if pygame.sprite.spritecollide(self, Goomba_group, False,pygame.sprite.collide_rect_ratio(0.8)):
 					game_over = -1
 					die_fx.play()
 					pygame.mixer.music.stop()
@@ -181,10 +186,16 @@ class Player():
 				die_fx.play()
 				pygame.mixer.music.stop()
 
+			if pygame.sprite.spritecollide(self, Mystery_Group, False, pygame.sprite.collide_rect_ratio(0.7)):
+				game_over = -2
+				mystery_fx.play()
+				pygame.mixer.music.stop()
+
 			#Check da cham vao ngoi sao
 			if pygame.sprite.spritecollide(self, Star_Group, True,  pygame.sprite.collide_rect_ratio(0.7)):
 				game_over = 1
 				pygame.mixer.music.stop()
+				victory_fx.play()
 
 			#Cap nhat vi tri moi cua nhan vat
 			self.rect.x += dx
@@ -196,7 +207,11 @@ class Player():
 			draw_text('GAME OVER!', font, blue, Width//2 - 150, Height//2 - 100)		
 			if self.rect.y > 750:
 				self.rect.y -= 5
-				
+		elif game_over == -2:
+			self.image = self.dead_image	
+			draw_text('GAME OVER!', font, blue, Width//2 - 150, Height//2 - 100)		
+			if self.rect.y > 750:
+				self.rect.y -= 5		
 		#Cap nhat nhan vat len man hinh
 		screen.blit(self.image, self.rect)
 			
@@ -266,6 +281,9 @@ class World():
 				if tile == 6:
 					star = Star(col_count * tile_size, row_count * tile_size)
 					Star_Group.add(star)
+				if tile == 7:
+					box = Mystery_Box(col_count * tile_size, row_count * tile_size)
+					Mystery_Group.add(box)
 				col_count += 1 
 			row_count += 1
 
@@ -352,20 +370,29 @@ class Coin(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 
+class Mystery_Box(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		img = pygame.image.load('img/Mystery_box.png')
+		self.image = pygame.transform.scale(img,  (tile_size , tile_size))
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
 world_data = [
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
 [2, 0, 0, 0, 0, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 5, 5, 0, 2],
-[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 6, 2],
-[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5, 0, 0, 0, 1, 1, 1, 2],
-[2, 0, 0, 2, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2],
+[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5, 0, 0, 0, 5, 5, 6, 2],
+[2, 0, 0, 0, 0, 0, 0, 0, 5, 5, 2, 0, 0, 2, 5, 5, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 1, 1, 1, 2],
+[2, 0, 0, 2, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 7, 2],
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
 [2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-[2, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+[2, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2],
 [2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
 [2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 2],
-[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2],
-[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 2],
+[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 5, 5, 2],
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 2],
 [2, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 1, 1, 2],
 [2, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 5, 5, 5, 0, 0, 0, 0, 1, 1, 1, 2],
@@ -380,6 +407,7 @@ Goomba_group = pygame.sprite.Group()
 Coin_Group   = pygame.sprite.Group()
 Lava_Group   = pygame.sprite.Group()
 Star_Group   = pygame.sprite.Group()
+Mystery_Group= pygame.sprite.Group()
 
 score_coin = Coin(tile_size //2, tile_size //2)
 Coin_Group.add(score_coin)
@@ -422,6 +450,7 @@ while run == True:
 		Lava_Group.draw(screen)
 		Coin_Group.draw(screen)
 		Star_Group.draw(screen)
+		Mystery_Group.draw(screen)
 
 		game_over = player.update(game_over)
 
@@ -431,19 +460,35 @@ while run == True:
 				world = reset()
 				game_over = 0
 				score = 0
+				victory_fx.stop()
+				die_fx.stop()
 				pygame.mixer.music.load('img/mario_theme.wav')
 				pygame.mixer.music.play(-1 , 0.0, 500)
 				pygame.mixer.music.set_volume(0.3)
 		if game_over == 1:	#Win
 			draw_text('YOU WIN!', font, blue, Width //2 - 110, Height //2 -100)
+			
 			if restart_button.draw():
 				world = reset()
 				game_over = 0
 				score = 0
+				victory_fx.stop()
+				die_fx.stop()
 				pygame.mixer.music.load('img/mario_theme.wav')
 				pygame.mixer.music.play(-1 , 0.0, 500)
 				pygame.mixer.music.set_volume(0.3)
-			
+		if game_over == -2:	#Curiousity			
+			draw_text('Why did you do that?', font, white, Width //2 - 280, Height //2 + 60)	
+			if restart_button.draw():
+				world = reset()
+				game_over = 0
+				score = 0
+				victory_fx.stop()
+				die_fx.stop()
+				mystery_fx.stop()
+				pygame.mixer.music.load('img/mario_theme.wav')
+				pygame.mixer.music.play(-1 , 0.0, 500)
+				pygame.mixer.music.set_volume(0.3)	
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
