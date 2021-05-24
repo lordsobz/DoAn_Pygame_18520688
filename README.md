@@ -7,4 +7,4 @@
     - Các tính năng của một trò chơi platformer bình thường như: Chạy, nhảy, gameover, điểm, nhặt coin,...
     - Sound effect (pygame.mixer)
 ___________________________________________________________________________________________________________
-# Thư mục trong Branch Master ( CHƯA HOÀN THIỆN )
+# Thư mục trong Branch Master ( Finished )
