@@ -51,6 +51,7 @@ victory_fx = pygame.mixer.Sound("img/Victory_real.mp3")
 victory_fx.set_volume(0.45)
 mystery_fx = pygame.mixer.Sound("img/Mystery_fx.mp3")
 mystery_fx.set_volume(0.8)
+
 def draw_text(text, font, text_col, x, y):
 	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
