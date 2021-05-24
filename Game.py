@@ -97,11 +97,12 @@ class Player():
 		if game_over == 0:
 
 			#Set key
-			key = pygame.key.get_pressed()	
+			key = pygame.key.get_pressed()
 			if key[pygame.K_q]:
 				pygame.quit()
 			if key[pygame.K_r]:
 				reset()	
+				score = 0 		
 			if key[pygame.K_UP] and self.jumped == False and self.floating == False:
 				jump_fx.play()
 				self.vel_y = -20
@@ -161,18 +162,19 @@ class Player():
 						self.vel_y = 0
 						self.floating = False
 
+
 			#Check va cham voi chuong ngai vat
 			if pygame.sprite.spritecollide(self, Goomba_group, False):
 				game_over = -1
 				die_fx.play()
-				pygame.mixer.music.stop()
+				pygame.mixer.music.stop()			
 			if pygame.sprite.spritecollide(self, Lava_Group, False):
 				game_over = -1
 				die_fx.play()
 				pygame.mixer.music.stop()
-			
+
 			#Check da cham vao ngoi sao
-			if pygame.sprite.spritecollide(self, Star_Group, False):
+			if pygame.sprite.spritecollide(self, Star_Group, True):
 				game_over = 1
 				pygame.mixer.music.stop()
 
@@ -189,6 +191,7 @@ class Player():
 				
 		#Cap nhat nhan vat len man hinh
 		screen.blit(self.image, self.rect)
+		pygame.draw.rect(screen, (255,255,255), self, 2)
 			
 		return game_over
 
@@ -270,12 +273,13 @@ class Enemy(pygame.sprite.Sprite):
 		self.index = 0
 		for step in range(1,3):
 			self.image = pygame.image.load(f'img/Goomba{step}.png')
-			self.image = pygame.transform.scale(self.image,  (45, 45))
+			self.image = pygame.transform.scale(self.image,  (50, 45))
 			self.images_enemy.append(self.image)
 		self.rect = self.image.get_rect()
 				
 		self.rect.x = x
 		self.rect.y = y
+		self.hitbox = x // 2
 		self.move_direction = 1
 		self.move_counter = 0
 		self.scounter = 0
@@ -312,7 +316,9 @@ class Lava(pygame.sprite.Sprite):
 		self.rect.x = x
 		self.rect.y = y
 		self.lcounter = 0
-	
+		
+		
+
 	def update(self):
 		lava_cooldown = 18
 		self.lcounter += 1
@@ -355,9 +361,9 @@ world_data = [
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2],
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 2],
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 2],
-[2, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2],
-[2, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 1, 1, 2],
-[2, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 5, 5, 5, 0, 0, 0, 1, 1, 1, 1, 2],
+[2, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 1, 1, 2],
+[2, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 5, 5, 5, 0, 0, 0, 0, 1, 1, 1, 2],
+[2, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 5, 3, 5, 0, 0, 0, 1, 1, 1, 1, 2],
 [1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
@@ -404,7 +410,8 @@ while run == True:
 				score +=1
 				coin_fx.play()
 			draw_text('x' +str(score), font_score, white, tile_size -10, 10)
-
+		
+		#Draw len man hinh 
 		Goomba_group.draw(screen)
 		Lava_Group.draw(screen)
 		Coin_Group.draw(screen)
@@ -422,7 +429,7 @@ while run == True:
 				pygame.mixer.music.play(-1 , 0.0, 500)
 				pygame.mixer.music.set_volume(0.3)
 		if game_over == 1:	#Win
-			draw_text('YOU WIN!!!', font, blue, Width //2 - 110, Height //2 -100)
+			draw_text('YOU WIN!', font, blue, Width //2 - 110, Height //2 -100)
 			if restart_button.draw():
 				world = reset()
 				game_over = 0
