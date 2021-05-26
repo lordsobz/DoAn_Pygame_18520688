@@ -51,12 +51,17 @@ victory_fx = pygame.mixer.Sound("img/Victory_real.mp3")
 victory_fx.set_volume(0.45)
 mystery_fx = pygame.mixer.Sound("img/Mystery_fx.mp3")
 mystery_fx.set_volume(0.8)
-
 def draw_text(text, font, text_col, x, y):
 	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
 
+def draw_grid():
+	for line in range(0,100):
+		pygame.draw.line(screen, white, (0, line * tile_size), (Width, line * tile_size))
+		pygame.draw.line(screen, white, (line * tile_size, 0), (line * tile_size, Height))
+
 def reset():
+	""" Ham reset sau khi game over se tra lai cac bien so va tai tao lai the gioi"""
 	player.reset(100, Height - 170)
 	Goomba_group.empty()
 	Lava_Group.empty()
@@ -68,6 +73,7 @@ def reset():
 	return world
 
 class Button():
+	""" Hien thi game main menu """
 	def __init__(self, x, y ,image):
 		self.image = image
 		self.rect = self.image.get_rect()
@@ -76,6 +82,7 @@ class Button():
 		self.clicked = False
 	
 	def draw(self):
+		""" Ham hien thi cac nut chuc nang"""
 		action = False
 
 		#xac dinh con tro chuot
@@ -88,16 +95,20 @@ class Button():
 				self.clicked = True
 		if pygame.mouse.get_pressed()[0] == 0:
 			self.clicked = False
+
 		#Giao dien nut bam
 		screen.blit(self.image, self.rect)
 
 		return action
 
 class Player():
+	"""Khoi tao nhan vat va thiet lap cac tinh nang"""
 	def __init__(self, x, y):
+		"""Constructor cua class Player"""
 		self.reset(x,y)
 
 	def update(self,game_over):
+		"""Ham thiet lap nut bam va dieu kien cho nguoi choi de thuc hien cac tinh nang"""
 		dx = 0
 		dy = 0
 		walk_cooldown = 4
@@ -148,7 +159,7 @@ class Player():
 			#Them trong luc
 			self.vel_y += 1
 			if self.vel_y > 10:
-				self.vel_y = 20
+				self.vel_y = 20 #Luc hap dan manh nen keo nguoi choi xuong
 			dy += self.vel_y
 
 			#Them va cham
@@ -172,7 +183,7 @@ class Player():
 
 
 			#Check va cham voi chuong ngai vat
-			if self.floating == True:
+			if self.floating == True: #Nhay len dau ke thu
 				if pygame.sprite.spritecollide(self, Goomba_group, True):
 					self.vel_y = -16
 					self.jumped = True
@@ -208,11 +219,13 @@ class Player():
 			draw_text('GAME OVER!', font, blue, Width//2 - 150, Height//2 - 100)		
 			if self.rect.y > 750:
 				self.rect.y -= 5
+
 		elif game_over == -2:
 			self.image = self.dead_image	
 			draw_text('GAME OVER!', font, blue, Width//2 - 150, Height//2 - 100)		
 			if self.rect.y > 750:
-				self.rect.y -= 5		
+				self.rect.y -= 5	
+
 		#Cap nhat nhan vat len man hinh
 		screen.blit(self.image, self.rect)
 			
@@ -244,7 +257,9 @@ class Player():
 		self.floating = True
 	
 class World():
+	"""Class khoi tao the gioi bao gom cac tile chua hinh anh da duoc dinh san """
 	def __init__(self, data):
+		"""Constructor """
 		self.tile_list = []
 
 		#Xuat hinh anh ra man hinh
@@ -289,11 +304,14 @@ class World():
 			row_count += 1
 
 	def draw(self):
+		""" Hien thi cac tile len man hinh sau khi da tai thanh cong"""
 		for tile in self.tile_list:
 			screen.blit(tile[0], tile[1])
 
+
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self, x, y):
+		"""Constructor"""
 		pygame.sprite.Sprite.__init__(self)
 		self.images_enemy = []
 		self.index = 0
@@ -312,6 +330,7 @@ class Enemy(pygame.sprite.Sprite):
 		
 
 	def update(self):
+		"""Hoat anh di chuyen"""
 		move_cooldown = 18
 		self.scounter += 1
 		if self.scounter > move_cooldown:
@@ -329,6 +348,7 @@ class Enemy(pygame.sprite.Sprite):
 
 class Lava(pygame.sprite.Sprite):
 	def __init__(self, x, y):
+		""" Constructor Lava"""
 		pygame.sprite.Sprite.__init__(self)
 		self.images_lava = []
 		self.index = 0
@@ -345,6 +365,7 @@ class Lava(pygame.sprite.Sprite):
 		
 
 	def update(self):
+		"""Them hoat anh di chuyen cho dung nham """
 		lava_cooldown = 18
 		self.lcounter += 1
 		if self.lcounter > lava_cooldown:
@@ -356,6 +377,7 @@ class Lava(pygame.sprite.Sprite):
 
 class Star(pygame.sprite.Sprite):
 	def __init__(self, x, y):
+		"""Constructor"""
 		pygame.sprite.Sprite.__init__(self)
 		img = pygame.image.load('img/star.png')
 		self.image = pygame.transform.scale(img,  (tile_size , tile_size))
@@ -365,6 +387,7 @@ class Star(pygame.sprite.Sprite):
 
 class Coin(pygame.sprite.Sprite):
 	def __init__(self, x, y):
+		"""Constructor"""
 		pygame.sprite.Sprite.__init__(self)
 		img = pygame.image.load('img/coin.png')
 		self.image = pygame.transform.scale(img,  (tile_size//2 , tile_size//2))
@@ -373,6 +396,7 @@ class Coin(pygame.sprite.Sprite):
 
 class Mystery_Box(pygame.sprite.Sprite):
 	def __init__(self, x, y):
+		"""Constructor"""
 		pygame.sprite.Sprite.__init__(self)
 		img = pygame.image.load('img/Mystery_box.png')
 		self.image = pygame.transform.scale(img,  (tile_size , tile_size))
@@ -455,7 +479,7 @@ while run == True:
 
 		game_over = player.update(game_over)
 
-		#check trang thai nguoi choi thi 
+		#check trang thai nguoi choi
 		if game_over == -1:	#Chet
 			if restart_button.draw():
 				world = reset()
