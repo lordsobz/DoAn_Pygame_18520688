@@ -6,5 +6,7 @@
 - Tính năng:
     - Các tính năng của một trò chơi platformer bình thường như: Chạy, nhảy, gameover, điểm, nhặt coin,...
     - Sound effect (pygame.mixer)
+- Thư viện sử dụng: pygame
+- Module sử dụng: Pygame.locals, mixer
 ___________________________________________________________________________________________________________
 # Thư mục trong Branch Master ( Finished )
